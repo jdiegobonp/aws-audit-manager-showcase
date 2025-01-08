@@ -19,6 +19,13 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "kms_sse" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "acl_ownership" {
+  bucket = aws_s3_bucket.audit_manager_report.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "public_access_block" {
   bucket = aws_s3_bucket.audit_manager_report.id
 
@@ -31,6 +38,7 @@ resource "aws_s3_bucket_public_access_block" "public_access_block" {
 resource "aws_s3_bucket_acl" "acl" {
   bucket = aws_s3_bucket.audit_manager_report.id
   acl    = "private"
+  depends_on = [aws_s3_bucket_ownership_controls.acl_ownership]
 }
 
 resource "aws_s3_bucket_versioning" "versioning" {
